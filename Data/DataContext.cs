@@ -9,6 +9,8 @@ public class DataContext : DbContext
 
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
+    public DbSet<Presupuesto> Presupuestos { get; set; }
+    public DbSet<Proyeccion> Proyecciones { get; set; }
 
     //Para hacer que correo se unico en la base de datos
     protected override void OnModelCreating(ModelBuilder modelBuilder)

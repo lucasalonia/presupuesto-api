@@ -23,7 +23,7 @@ public class UsuariosController : ControllerBase
 
 
     [HttpPost("registro")]
-    public async Task<IActionResult> Registro([FromBody] RegistroSolicitudDto request)
+    public async Task<IActionResult> Registro([FromBody] UsuarioDto request)
     {
         if (string.IsNullOrEmpty(request.Nickname) || string.IsNullOrEmpty(request.Contraseña) || string.IsNullOrEmpty(request.Correo))
         {
@@ -40,7 +40,8 @@ public class UsuariosController : ControllerBase
             Nickname = request.Nickname,
             Correo = request.Correo,
             Contraseña = _encriptadorService.HashPassword(request.Contraseña),
-            Rol = "Persona"
+            Rol = "Persona",
+            FechaCreacion = DateTime.UtcNow
         };
         await _usuarioRepositorio.CrearAsync(usuario);
         return Ok(new { mensaje = "Usuario creado correctamente." });
@@ -101,9 +102,28 @@ public class UsuariosController : ControllerBase
         {
             usuario.Nickname = usuarioActualizado.Nickname.Trim();
         }
-            
+
+        usuario.FechaModificacion = DateTime.UtcNow;    
         await _usuarioRepositorio.ActualizarAsync(usuario);
         return Ok(new { mensaje = "Perfil actualizado correctamente." });
+    }
+
+    [HttpDelete("eliminar")]
+    [Authorize]
+    public async Task<IActionResult> EliminarPerfil()
+    {
+        var idClaim = User.FindFirst("idUsuario")?.Value;
+
+        if (idClaim == null)
+            return Unauthorized();
+
+        var id = int.Parse(idClaim);
+        var usuario = await _usuarioRepositorio.BuscarPorIdAsync(id);
+        if (usuario == null)
+            return NotFound();
+
+        await _usuarioRepositorio.EliminarAsync(usuario);
+        return Ok(new { mensaje = "Perfil eliminado correctamente." });
     }
 
 }

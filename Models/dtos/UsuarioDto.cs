@@ -1,5 +1,5 @@
 namespace presupuesto_api.Models.DTOs;
-using System.ComponentModel.DataAnnotations;
+
 
 public class UsuarioDto
 {

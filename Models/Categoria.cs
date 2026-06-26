@@ -9,11 +9,16 @@ namespace presupuesto_api.Models;
     {
         [Key]
         [Column("id_categoria")]
-        public int IdCategoria { get; set; }
-
+        public int Id { get; set; }
+        
         [Required]
         [Column("id_usuario")]
         public int IdUsuario { get; set; }
+
+
+        //Relacion necesaria para que lo identifique Entity Framework y pueda hacer la relación entre las tablas
+       [ForeignKey(nameof(IdUsuario))]
+        public Usuario? Usuario { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -24,11 +29,10 @@ namespace presupuesto_api.Models;
         [Column("descripcion")]
         public string? Descripcion { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    
         [Column("fecha_creacion")]
         public DateTime FechaCreacion { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Column("fecha_modificacion")]
         public DateTime? FechaModificacion { get; set; }
 

@@ -23,10 +23,13 @@ public class AuthController : ControllerBase
         _tokenService = tokenService;
     }
 
-
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginSolicitudDto request)
+    public async Task<IActionResult> Login([FromBody] UsuarioDto request)
     {
+        if (string.IsNullOrEmpty(request.Correo) || string.IsNullOrEmpty(request.Contraseña))
+        {
+            return BadRequest(new { Mensaje = "Correo y contraseña son obligatorios" });
+        }
         var usuario = await _usuarioRepositorio.BuscarPorCorreoAsync(request.Correo);
     
         if (usuario == null)

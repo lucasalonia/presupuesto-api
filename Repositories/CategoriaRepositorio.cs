@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using presupuesto_api.Models; // Ajustá según tu namespace real
-using presupuesto_api.Data;  // Ajustá al namespace de tu ApplicationDbContext
+using presupuesto_api.Models; 
+using presupuesto_api.Data; 
 
 namespace presupuesto_api.Repositories;
 

@@ -28,14 +28,14 @@ public class Usuario
     [MaxLength(50)]
     [Column("rol")]
     public string Rol { get; set; } = "Persona";
-
   
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("fecha_creacion")]
     public DateTime  FechaCreacion{ get; set; } 
-
   
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     [Column("fecha_modificacion")]
     public DateTime  FechaModificacion{ get; set; } 
+
+    // Relación uno a muchos con la entidad Categoria. ENTITY FRAMEWORK NECESITA ESTO PARA PODER RELACIONAR LAS TABLAS
+    public ICollection<Categoria> Categorias { get; set; }
+    = new List<Categoria>();
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using presupuesto_api.Data;
 
@@ -10,9 +11,11 @@ using presupuesto_api.Data;
 namespace presupuesto_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260626172411_ProyeccionPresupuestoInit")]
+    partial class ProyeccionPresupuestoInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,6 +67,7 @@ namespace presupuesto_api.Migrations
                         .HasColumnName("id_presupuesto");
 
                     b.Property<string>("Descripcion")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)")
                         .HasColumnName("descripcion");
@@ -72,11 +76,11 @@ namespace presupuesto_api.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("fecha_creacion");
 
-                    b.Property<DateTime?>("FechaFin")
+                    b.Property<DateTime>("FechaFin")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("fecha_fin");
 
-                    b.Property<DateTime?>("FechaInicio")
+                    b.Property<DateTime>("FechaInicio")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("fecha_inicio");
 
