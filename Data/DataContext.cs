@@ -22,5 +22,11 @@ public class DataContext : DbContext
             entity.HasIndex(e => e.Correo)
                   .IsUnique();
         });
+
+        modelBuilder.Entity<Proyeccion>()
+        .Property(p => p.Monto)
+        .HasColumnType("decimal(18,2)");
+        
     }
+    
 }

@@ -87,9 +87,19 @@ public class PresupuestosController : ControllerBase
             return NotFound(new { mensaje = "Presupuesto no encontrado." });
 
         
-        if (string.IsNullOrWhiteSpace(presupuestoDto.Nombre)|| presupuestoDto.Nombre.Length > 100)
-            return BadRequest(new { mensaje = "El nombre del presupuesto es obligatorio y no puede exceder los 100 caracteres." });
-         
+        if (presupuestoDto.Nombre.Length > 100)
+            return BadRequest(new { mensaje = "No puede exceder los 100 caracteres." });
+
+        if (string.IsNullOrWhiteSpace(presupuestoDto.Nombre))
+        {
+            presupuestoDto.Nombre = presupuesto.Nombre; 
+        }
+        if (presupuestoDto.Descripcion != null && presupuestoDto.Descripcion.Length > 500)
+            return BadRequest(new { mensaje = "La descripción del presupuesto no puede exceder los 500 caracteres." });
+        if (string.IsNullOrWhiteSpace(presupuestoDto.Descripcion))
+        {
+            presupuestoDto.Descripcion = presupuesto.Descripcion; 
+        }
 
         presupuesto.Nombre = presupuestoDto.Nombre;
         presupuesto.Descripcion = presupuestoDto.Descripcion;
@@ -99,5 +109,21 @@ public class PresupuestosController : ControllerBase
 
         await _presupuestoRepositorio.ActualizarAsync(presupuesto);
         return Ok(presupuesto);
+    }
+
+    [HttpDelete("eliminar/{id}")]
+    [Authorize]
+    public async Task<IActionResult> EliminarPresupuesto(int id)
+    {
+        var idClaim = User.FindFirst("idUsuario")?.Value;
+        if (idClaim == null)
+            return Unauthorized();
+
+        var presupuesto = await _presupuestoRepositorio.BuscarPorIdAsync(id);
+        if (presupuesto == null)
+            return NotFound(new { mensaje = "Presupuesto no encontrado." });
+        
+        await _presupuestoRepositorio.EliminarAsync(presupuesto);
+        return Ok(new { mensaje = "Presupuesto eliminado correctamente." });
     }
 }

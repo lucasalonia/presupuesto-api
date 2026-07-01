@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using presupuesto_api.Data;
 
@@ -10,9 +11,11 @@ using presupuesto_api.Data;
 namespace presupuesto_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260701150642_ModPropiedadPresupuesto")]
+    partial class ModPropiedadPresupuesto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,7 +133,7 @@ namespace presupuesto_api.Migrations
                         .HasColumnName("id_presupuesto");
 
                     b.Property<decimal>("Monto")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(65,30)")
                         .HasColumnName("monto");
 
                     b.Property<string>("Nombre")
@@ -228,7 +231,7 @@ namespace presupuesto_api.Migrations
                         .HasForeignKey("IdCategoria");
 
                     b.HasOne("presupuesto_api.Models.Presupuesto", "Presupuesto")
-                        .WithMany()
+                        .WithMany("Proyecciones")
                         .HasForeignKey("IdPresupuesto")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -236,6 +239,11 @@ namespace presupuesto_api.Migrations
                     b.Navigation("Categoria");
 
                     b.Navigation("Presupuesto");
+                });
+
+            modelBuilder.Entity("presupuesto_api.Models.Presupuesto", b =>
+                {
+                    b.Navigation("Proyecciones");
                 });
 
             modelBuilder.Entity("presupuesto_api.Models.Usuario", b =>

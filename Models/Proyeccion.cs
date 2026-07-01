@@ -34,7 +34,7 @@ public class Proyeccion
 
     [Column("descripcion")]
     [MaxLength(500)]
-    public string Descripcion { get; set; } = string.Empty;
+    public string? Descripcion { get; set; } = string.Empty;
 
     [Required]
     [Column("monto")]
@@ -46,5 +46,5 @@ public class Proyeccion
     [Column("fecha_modificacion")]
     public DateTime  FechaModificacion{ get; set; } 
 
-    public ICollection<Proyeccion> Proyecciones { get; set; } = new List<Proyeccion>();
+
 }

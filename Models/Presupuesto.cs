@@ -36,4 +36,5 @@ public class Presupuesto
   
     [Column("fecha_modificacion")]
     public DateTime  FechaModificacion{ get; set; } 
+   
 }

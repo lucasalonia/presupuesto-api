@@ -50,6 +50,7 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtSett
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 builder.Services.AddScoped<IPresupuestoRepositorio, PresupuestoRepositorio>();
+builder.Services.AddScoped<IProyeccionRepositorio, ProyeccionRepositorio>();
 
 //Dependencia de servicios
 builder.Services.AddScoped<ITokenService, TokenService>();
