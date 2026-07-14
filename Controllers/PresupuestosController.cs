@@ -26,8 +26,21 @@ public class PresupuestosController : ControllerBase
         if (presupuesto == null)
             return NotFound(new { mensaje = "Presupuesto no encontrado." });
 
-        return Ok(presupuesto);
+        var presupuestoDto = new PresupuestoDto
+        {
+            Id = presupuesto.Id,
+            IdUsuario = presupuesto.IdUsuario,
+            Nombre = presupuesto.Nombre,
+            Descripcion = presupuesto.Descripcion,
+            Estado = presupuesto.Estado,
+            FechaInicio = presupuesto.FechaInicio,
+            FechaFin = presupuesto.FechaFin,
+            FechaCreacion = presupuesto.FechaCreacion,
+            FechaModificacion = presupuesto.FechaModificacion
+        };
+        return Ok(presupuestoDto);
     } 
+
     [HttpGet("listar")]
     [Authorize]
     public async Task<IActionResult> ListarPresupuestos()
@@ -60,18 +73,48 @@ public class PresupuestosController : ControllerBase
         if(presupuestoDto.Descripcion != null && presupuestoDto.Descripcion.Length > 500)
             return BadRequest(new { mensaje = "La descripción del presupuesto no puede exceder los 500 caracteres." });
         
-        //Descripcion, FechaInicio y FechaFin son opcionales y nulos or defecto. 
         var presupuesto = new Presupuesto
         {
             IdUsuario = int.Parse(idClaim),
             Nombre = presupuestoDto.Nombre,
             Descripcion = presupuestoDto.Descripcion,
+            Estado = true,
             FechaInicio = presupuestoDto.FechaInicio,
             FechaFin = presupuestoDto.FechaFin,
             FechaCreacion = DateTime.UtcNow
         };
         await _presupuestoRepositorio.CrearAsync(presupuesto);
         return CreatedAtAction(nameof(ObtenerPresupuesto), new { id = presupuesto.Id }, presupuesto);
+    }
+
+    [HttpPatch("actualizar-estado/{id}")]
+    [Authorize]
+    public async Task<IActionResult> ActualizarEstadoPresupuesto(int id, [FromBody] bool estado)
+    {
+        var idClaim = User.FindFirst("idUsuario")?.Value;
+        if (idClaim == null)
+            return Unauthorized();
+
+        var presupuesto = await _presupuestoRepositorio.BuscarPorIdAsync(id);
+        if (presupuesto == null)
+            return NotFound(new { mensaje = "Presupuesto no encontrado." });
+
+        presupuesto.Estado = estado;
+        await _presupuestoRepositorio.ActualizarAsync(presupuesto);
+
+        var presupuestoDto = new PresupuestoDto
+        {
+            Id = presupuesto.Id,
+            IdUsuario = presupuesto.IdUsuario,
+            Nombre = presupuesto.Nombre,
+            Descripcion = presupuesto.Descripcion,
+            Estado = presupuesto.Estado,
+            FechaInicio = presupuesto.FechaInicio,
+            FechaFin = presupuesto.FechaFin,
+            FechaCreacion = presupuesto.FechaCreacion,
+            FechaModificacion = presupuesto.FechaModificacion
+        };
+        return Ok(presupuestoDto);
     }
 
     [HttpPatch("actualizar/{id}")]
@@ -106,9 +149,8 @@ public class PresupuestosController : ControllerBase
         presupuesto.FechaInicio = presupuestoDto.FechaInicio;
         presupuesto.FechaFin = presupuestoDto.FechaFin;
         presupuesto.FechaModificacion = DateTime.UtcNow;
-
         await _presupuestoRepositorio.ActualizarAsync(presupuesto);
-        return Ok(presupuesto);
+        return Ok(presupuestoDto);
     }
 
     [HttpDelete("eliminar/{id}")]
@@ -126,4 +168,5 @@ public class PresupuestosController : ControllerBase
         await _presupuestoRepositorio.EliminarAsync(presupuesto);
         return Ok(new { mensaje = "Presupuesto eliminado correctamente." });
     }
+
 }

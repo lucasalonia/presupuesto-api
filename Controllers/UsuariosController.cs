@@ -25,26 +25,26 @@ public class UsuariosController : ControllerBase
     [HttpPost("registro")]
     public async Task<IActionResult> Registro([FromBody] UsuarioDto request)
     {
-        if (string.IsNullOrEmpty(request.Nickname) || string.IsNullOrEmpty(request.Contraseña) || string.IsNullOrEmpty(request.Correo))
+        if (string.IsNullOrEmpty(request.Nickname) || string.IsNullOrEmpty(request.Contrasenia) || string.IsNullOrEmpty(request.Correo))
         {
-            return BadRequest(new { mensaje = "Todos los campos son obligatorios." });
+            return BadRequest( "Todos los campos son obligatorios." );
         }
         var usuarioExistente = await _usuarioRepositorio.BuscarPorCorreoAsync(request.Correo);
         if (usuarioExistente != null)
         {
-            return BadRequest(new { mensaje = "El correo ya está registrado." });
+            return BadRequest( "El correo ya está registrado." );
         }
 
         var usuario = new Usuario
         {
             Nickname = request.Nickname,
             Correo = request.Correo,
-            Contraseña = _encriptadorService.HashPassword(request.Contraseña),
+            Contraseña = _encriptadorService.HashPassword(request.Contrasenia),
             Rol = "Persona",
             FechaCreacion = DateTime.UtcNow
         };
         await _usuarioRepositorio.CrearAsync(usuario);
-        return Ok(new { mensaje = "Usuario creado correctamente." });
+        return Ok("\"Usuario creado correctamente.\"" );
     }
 
 

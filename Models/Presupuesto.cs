@@ -25,6 +25,9 @@ public class Presupuesto
     [MaxLength(500)]
     public string? Descripcion { get; set; }
 
+    [Column("estado")]
+    public bool Estado { get; set; }
+
     [Column("fecha_inicio")]
     public DateTime? FechaInicio { get; set; }
 
@@ -36,5 +39,17 @@ public class Presupuesto
   
     [Column("fecha_modificacion")]
     public DateTime  FechaModificacion{ get; set; } 
+
+
+     public bool VerificarYActualizarEstado()
+    {
+        if (Estado && FechaFin.HasValue && FechaFin.Value.Date <= DateTime.UtcNow.Date)
+        {
+            Estado = false;
+            FechaModificacion = DateTime.UtcNow;
+            return true; 
+        }
+        return false;
+    }
    
 }

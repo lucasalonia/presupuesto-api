@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using presupuesto_api.Models; 
-using presupuesto_api.Data; 
+using presupuesto_api.Models;
+using presupuesto_api.Data;
 
 namespace presupuesto_api.Repositories;
 
@@ -15,14 +15,20 @@ public class PresupuestoRepositorio : IPresupuestoRepositorio
 
     public async Task<Presupuesto> BuscarPorIdAsync(int id)
     {
-        return await _context.Presupuestos.FindAsync(id);
+        var presupuesto = await _context.Presupuestos.Include(p => p.Usuario).FirstOrDefaultAsync(p => p.Id == id);
+        
+        if (presupuesto != null && presupuesto.VerificarYActualizarEstado())
+        {
+            await _context.SaveChangesAsync();
+        }
+        return presupuesto;
     }
 
     public async Task<IEnumerable<Presupuesto>> BuscarPorIdUsuarioAsync(int usuarioId)
     {
-           return await _context.Presupuestos
-            .Where(p => p.IdUsuario == usuarioId)
-            .ToListAsync();
+        return await _context.Presupuestos
+         .Where(p => p.IdUsuario == usuarioId)
+         .ToListAsync();
     }
 
     public async Task CrearAsync(Presupuesto presupuesto)

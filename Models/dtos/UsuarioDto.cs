@@ -7,7 +7,7 @@ public class UsuarioDto
     public string? Nickname { get; set; }
     public string? Correo { get; set; }
     public string? Rol { get; set; }
-    public string? Contraseña { get; set; }
+    public string? Contrasenia { get; set; }
     public DateTime FechaCreacion { get; set; }
     public DateTime FechaModificacion { get; set; }
 }

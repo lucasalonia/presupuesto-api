@@ -26,22 +26,22 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UsuarioDto request)
     {
-        if (string.IsNullOrEmpty(request.Correo) || string.IsNullOrEmpty(request.Contraseña))
+        if (string.IsNullOrEmpty(request.Correo) || string.IsNullOrEmpty(request.Contrasenia))
         {
-            return BadRequest(new { Mensaje = "Correo y contraseña son obligatorios" });
+            return BadRequest("Correo y contraseña son requeridos");
         }
         var usuario = await _usuarioRepositorio.BuscarPorCorreoAsync(request.Correo);
     
         if (usuario == null)
-            return Unauthorized(new { Mensaje = "Usuario o contraseña incorrectos" });
+            return Unauthorized("Usuario o contraseña incorrectos");
 
-        bool ContraseñaValida = _encriptadorService.VerifyPassword(request.Contraseña, usuario.Contraseña);
+        bool ContraseñaValida = _encriptadorService.VerifyPassword(request.Contrasenia, usuario.Contraseña);
 
         if (!ContraseñaValida)
-            return Unauthorized(new { Mensaje = "Usuario o contraseña incorrectos" });
+            return Unauthorized("Usuario o contraseña incorrectos");
 
         var token = _tokenService.GenerarTokenJWT(usuario);
-        return Ok(new { Token = token });
+        return Ok(token);
     }
 
 }
