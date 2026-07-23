@@ -10,6 +10,7 @@ public class PresupuestoDto
     public bool Estado { get; set; }
     public DateTime? FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }
+    public List<ProyeccionDto> Proyecciones { get; set; } = new();
     public DateTime FechaCreacion { get; set; }
     public DateTime FechaModificacion { get; set; }
 }

@@ -33,6 +33,7 @@ public class Presupuesto
 
     [Column("fecha_fin")]
     public DateTime? FechaFin { get; set; }
+    public ICollection<Proyeccion> Proyecciones { get; set; } = new List<Proyeccion>();
 
      [Column("fecha_creacion")]
     public DateTime  FechaCreacion{ get; set; } 

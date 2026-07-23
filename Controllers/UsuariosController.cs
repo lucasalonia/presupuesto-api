@@ -27,12 +27,12 @@ public class UsuariosController : ControllerBase
     {
         if (string.IsNullOrEmpty(request.Nickname) || string.IsNullOrEmpty(request.Contrasenia) || string.IsNullOrEmpty(request.Correo))
         {
-            return BadRequest( "Todos los campos son obligatorios." );
+            return BadRequest( "\"Todos los campos son obligatorios.\"" );
         }
         var usuarioExistente = await _usuarioRepositorio.BuscarPorCorreoAsync(request.Correo);
         if (usuarioExistente != null)
         {
-            return BadRequest( "El correo ya está registrado." );
+            return BadRequest( "\"El correo ya está registrado.\"" );
         }
 
         var usuario = new Usuario

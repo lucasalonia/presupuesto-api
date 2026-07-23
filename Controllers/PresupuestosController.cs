@@ -41,19 +41,69 @@ public class PresupuestosController : ControllerBase
         return Ok(presupuestoDto);
     } 
 
-    [HttpGet("listar")]
-    [Authorize]
-    public async Task<IActionResult> ListarPresupuestos()
-    {
-        var idClaim = User.FindFirst("idUsuario")?.Value;
-        if (idClaim == null)
-            return Unauthorized();
+   [HttpGet("listar")]
+[Authorize]
+public async Task<IActionResult> ListarPresupuestos()
+{
+    var idClaim = User.FindFirst("idUsuario")?.Value;
+    if (idClaim == null)
+        return Unauthorized();
 
-        var presupuestos = await _presupuestoRepositorio.BuscarPorIdUsuarioAsync(int.Parse(idClaim));
-        if (presupuestos == null || !presupuestos.Any())
-            return NotFound(new { mensaje = "No se encontraron presupuestos para este usuario." });
-        return Ok(presupuestos);
-    }
+    var presupuestos = await _presupuestoRepositorio.BuscarPorIdUsuarioAsync(int.Parse(idClaim));
+    return Ok(MapearAPresupuestoDto(presupuestos ?? new List<Presupuesto>()));
+}
+
+[HttpGet("listar-activos")]
+[Authorize]
+public async Task<IActionResult> ListarPresupuestosActivos()
+{
+    var idClaim = User.FindFirst("idUsuario")?.Value;
+    if (idClaim == null)
+        return Unauthorized();
+
+    var presupuestos = await _presupuestoRepositorio.BuscarActivosPorIdUsuarioAsync(int.Parse(idClaim));
+    return Ok(MapearAPresupuestoDto(presupuestos ?? new List<Presupuesto>()));
+}
+
+[HttpGet("listar-inactivos")]
+[Authorize]
+public async Task<IActionResult> ListarPresupuestosInactivos()
+{
+    var idClaim = User.FindFirst("idUsuario")?.Value;
+    if (idClaim == null)
+        return Unauthorized();
+
+    var presupuestos = await _presupuestoRepositorio.BuscarInactivosPorIdUsuarioAsync(int.Parse(idClaim));
+    return Ok(MapearAPresupuestoDto(presupuestos ?? new List<Presupuesto>()));
+}
+
+private IEnumerable<PresupuestoDto> MapearAPresupuestoDto(IEnumerable<Presupuesto> presupuestos)
+{
+    return presupuestos.Select(p => new PresupuestoDto
+    {
+        Id = p.Id,
+        IdUsuario = p.IdUsuario,
+        Nombre = p.Nombre,
+        Descripcion = p.Descripcion,
+        Estado = p.Estado,
+        FechaInicio = p.FechaInicio,
+        FechaFin = p.FechaFin,
+        FechaCreacion = p.FechaCreacion,
+        FechaModificacion = p.FechaModificacion,
+        Proyecciones = p.Proyecciones?.Select(pr => new ProyeccionDto
+        {
+            Id = pr.Id,
+            IdPresupuesto = pr.IdPresupuesto,
+            IdCategoria = pr.IdCategoria,
+            Tipo = pr.Tipo,
+            Nombre = pr.Nombre,
+            Descripcion = pr.Descripcion,
+            Monto = pr.Monto,
+            FechaInicio = pr.FechaCreacion,
+            FechaFin = pr.FechaModificacion
+        }).ToList() ?? new List<ProyeccionDto>()
+    });
+}
 
     [HttpPost("crear")]
     [Authorize]
@@ -97,9 +147,13 @@ public class PresupuestosController : ControllerBase
 
         var presupuesto = await _presupuestoRepositorio.BuscarPorIdAsync(id);
         if (presupuesto == null)
-            return NotFound(new { mensaje = "Presupuesto no encontrado." });
+            return NotFound("\"Presupuesto no encontrado.\"");
 
         presupuesto.Estado = estado;
+        if (estado)
+        {
+            presupuesto.FechaFin = null;
+        }
         await _presupuestoRepositorio.ActualizarAsync(presupuesto);
 
         var presupuestoDto = new PresupuestoDto
@@ -114,7 +168,7 @@ public class PresupuestosController : ControllerBase
             FechaCreacion = presupuesto.FechaCreacion,
             FechaModificacion = presupuesto.FechaModificacion
         };
-        return Ok(presupuestoDto);
+        return Ok("\"Estado del presupuesto actualizado correctamente.\"");
     }
 
     [HttpPatch("actualizar/{id}")]
@@ -127,18 +181,18 @@ public class PresupuestosController : ControllerBase
 
         var presupuesto = await _presupuestoRepositorio.BuscarPorIdAsync(id);
         if (presupuesto == null)
-            return NotFound(new { mensaje = "Presupuesto no encontrado." });
+            return NotFound("\"Presupuesto no encontrado.\"");
 
         
         if (presupuestoDto.Nombre.Length > 100)
-            return BadRequest(new { mensaje = "No puede exceder los 100 caracteres." });
+            return BadRequest("\"El nombre del presupuesto no puede exceder los 100 caracteres.\"");
 
         if (string.IsNullOrWhiteSpace(presupuestoDto.Nombre))
         {
             presupuestoDto.Nombre = presupuesto.Nombre; 
         }
         if (presupuestoDto.Descripcion != null && presupuestoDto.Descripcion.Length > 500)
-            return BadRequest(new { mensaje = "La descripción del presupuesto no puede exceder los 500 caracteres." });
+            return BadRequest("\"La descripción del presupuesto no puede exceder los 500 caracteres.\"");
         if (string.IsNullOrWhiteSpace(presupuestoDto.Descripcion))
         {
             presupuestoDto.Descripcion = presupuesto.Descripcion; 
@@ -163,10 +217,10 @@ public class PresupuestosController : ControllerBase
 
         var presupuesto = await _presupuestoRepositorio.BuscarPorIdAsync(id);
         if (presupuesto == null)
-            return NotFound(new { mensaje = "Presupuesto no encontrado." });
+            return NotFound("\"Presupuesto no encontrado.\"");
         
         await _presupuestoRepositorio.EliminarAsync(presupuesto);
-        return Ok(new { mensaje = "Presupuesto eliminado correctamente." });
+        return Ok("\"Presupuesto eliminado correctamente.\"");
     }
 
 }

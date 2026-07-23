@@ -27,7 +27,22 @@ public class PresupuestoRepositorio : IPresupuestoRepositorio
     public async Task<IEnumerable<Presupuesto>> BuscarPorIdUsuarioAsync(int usuarioId)
     {
         return await _context.Presupuestos
-         .Where(p => p.IdUsuario == usuarioId)
+        .Include(p => p.Proyecciones)
+        .Where(p => p.IdUsuario == usuarioId)
+        .ToListAsync();
+    }
+    public async Task<IEnumerable<Presupuesto>> BuscarActivosPorIdUsuarioAsync(int usuarioId)
+    {
+        return await _context.Presupuestos
+         .Include(p => p.Proyecciones)
+         .Where(p => p.IdUsuario == usuarioId && p.Estado)
+         .ToListAsync();
+    }
+    public async Task<IEnumerable<Presupuesto>> BuscarInactivosPorIdUsuarioAsync(int usuarioId)
+    {
+        return await _context.Presupuestos
+         .Include(p => p.Proyecciones)
+         .Where(p => p.IdUsuario == usuarioId && !p.Estado)
          .ToListAsync();
     }
 

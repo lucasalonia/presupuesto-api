@@ -28,32 +28,40 @@ public class CategoriasController : ControllerBase
         var id = int.Parse(idClaim);
         var categorias = await _categoriaRepositorio.BuscarPorUsuarioIdAsync(id);
 
-        if (categorias == null || !categorias.Any())
-            return NotFound(new { mensaje = "No se encontraron categorías para este usuario." });
-
-        return Ok(categorias);
+        return Ok(categorias ?? new List<Categoria>());
     }
     
     [HttpPost("crear")]
-    public async Task<IActionResult> CrearCategoria([FromBody] Categoria categoria)
+    public async Task<IActionResult> CrearCategoria([FromBody] CategoriaDto categoriaDto)
     {
+        
         var idClaim = User.FindFirst("idUsuario")?.Value;
-        if (idClaim == null)
+         if (idClaim == null)
             return Unauthorized();
+            
+        var id = int.Parse(idClaim);
+        
+        var categoria = new Categoria
+        {
+            Nombre = categoriaDto.Nombre?.Trim(),
+            Descripcion = categoriaDto.Descripcion?.Trim(),
+            IdUsuario = id,
+            FechaCreacion = DateTime.UtcNow
+        };
+        
+       
 
         if (categoria == null || string.IsNullOrEmpty(categoria.Nombre))
-            return BadRequest(new { mensaje = "El nombre de la categoría es obligatorio." });
+            return BadRequest( "\"El nombre de la categoría es obligatorio.\"" );
 
         if (categoria.Nombre.Length > 100)
-            return BadRequest(new { mensaje = "El nombre de la categoría no puede exceder los 100 caracteres." });
+            return BadRequest( "\"El nombre de la categoría no puede exceder los 100 caracteres.\"" );
         if (categoria.Descripcion != null && categoria.Descripcion.Length > 500)
-            return BadRequest(new { mensaje = "La descripción de la categoría no puede exceder los 500 caracteres." });
+            return BadRequest( "\"La descripción de la categoría no puede exceder los 500 caracteres.\"" );
 
-        var id = int.Parse(idClaim);
-        categoria.IdUsuario = id;
-        categoria.FechaCreacion = DateTime.UtcNow;
+       
         await _categoriaRepositorio.AgregarAsync(categoria);
-        return Ok(new { mensaje = "Categoría creada correctamente." });
+        return Ok("\"Categoría creada correctamente.\"");
     }
     [HttpGet("mostrar/{id}")]
     [Authorize]
@@ -61,7 +69,7 @@ public class CategoriasController : ControllerBase
     {
         var categoria = await _categoriaRepositorio.BuscarPorIdAsync(id);
         if (categoria == null)
-            return NotFound(new { mensaje = "Categoría no encontrada." });
+            return NotFound( "\"Categoría no encontrada.\"" );
 
         return Ok(categoria);
     }
@@ -77,11 +85,11 @@ public class CategoriasController : ControllerBase
         var categoriaExistente = await _categoriaRepositorio.BuscarPorIdAsync(id);
 
         if (categoriaExistente == null)
-            return NotFound(new { mensaje = "Categoría no encontrada." });
+            return NotFound( "\"Categoría no encontrada.\"" );
 
         if (string.IsNullOrWhiteSpace(categoriaDto.Nombre) && string.IsNullOrWhiteSpace(categoriaDto.Descripcion))
         {
-            return BadRequest(new { mensaje = "Algun campo debe ser modificado." });
+            return BadRequest( "\"Algun campo debe ser modificado.\"" );
         }
         
         if (!string.IsNullOrWhiteSpace(categoriaDto.Nombre))
@@ -98,7 +106,7 @@ public class CategoriasController : ControllerBase
 
         
         await _categoriaRepositorio.ActualizarAsync(categoriaExistente);
-        return Ok(new { mensaje = "Categoría actualizada correctamente." });
+        return Ok("\"Categoría actualizada correctamente.\"");
         
     }
 
@@ -108,10 +116,10 @@ public class CategoriasController : ControllerBase
     {
         var categoria = await _categoriaRepositorio.BuscarPorIdAsync(id);
         if (categoria == null)
-            return NotFound(new { mensaje = "Categoría no encontrada." });
+            return NotFound( "\"Categoría no encontrada.\"" );
 
         await _categoriaRepositorio.EliminarAsync(categoria);
-        return Ok(new { mensaje = "Categoría eliminada correctamente." });
+        return Ok( "\"Categoría eliminada correctamente.\"" );
     }
 
 }

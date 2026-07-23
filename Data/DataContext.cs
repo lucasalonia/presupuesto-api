@@ -27,6 +27,12 @@ public class DataContext : DbContext
         .Property(p => p.Monto)
         .HasColumnType("decimal(18,2)");
         
+        modelBuilder.Entity<Proyeccion>()
+        .HasOne(p => p.Categoria)
+        .WithMany()
+        .HasForeignKey(p => p.IdCategoria)
+        .OnDelete(DeleteBehavior.SetNull);
+
     }
-    
+
 }

@@ -86,7 +86,7 @@ public class ProyeccionesController : ControllerBase
         };
 
         await _proyeccionRepositorio.AgregarAsync(proyeccion);
-        return CreatedAtAction(nameof(MostrarProyeccion), new { id = proyeccion.Id }, proyeccion);
+        return CreatedAtAction(nameof(MostrarProyeccion), new { id = proyeccion.Id }, proyeccionDto);
     }
 
     [HttpPatch("actualizar/{id}")]
