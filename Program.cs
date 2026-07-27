@@ -60,6 +60,13 @@ builder.Services.AddScoped<IEncriptadorService, EncriptadorService>();
 
 var app = builder.Build();
 
+// Aplica las migraciones pendientes contra la base de datos al arrancar
+using (var scope = app.Services.CreateScope())
+{
+    var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+    dataContext.Database.Migrate();
+}
+
 // Pipeline de la aplicación
 app.UseHttpsRedirection();
 
