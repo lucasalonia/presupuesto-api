@@ -19,6 +19,7 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpGet("listar")]
+    [Authorize]
     public async Task<IActionResult> ListarCategoria()
     {
         var idClaim = User.FindFirst("idUsuario")?.Value;
@@ -32,6 +33,7 @@ public class CategoriasController : ControllerBase
     }
     
     [HttpPost("crear")]
+    [Authorize]
     public async Task<IActionResult> CrearCategoria([FromBody] CategoriaDto categoriaDto)
     {
         

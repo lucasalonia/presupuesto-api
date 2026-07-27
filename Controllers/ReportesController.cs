@@ -1,3 +1,4 @@
+using presupuesto_api.Models;
 using presupuesto_api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using presupuesto_api.Models.DTOs;
@@ -29,25 +30,18 @@ public async Task<IActionResult> GenerarReporteAhorro(int presupuestoId)
     if (presupuesto == null)
         return NotFound(new { mensaje = "Presupuesto no encontrado." });
 
-    var proyecciones = await _proyeccionRepositorio.BuscarPorPresupuestoIdAsync(presupuestoId);
-    if (proyecciones == null || !proyecciones.Any())
-        return NotFound(new { mensaje = "No se encontraron proyecciones para este presupuesto." });
+    var proyecciones = await _proyeccionRepositorio.BuscarPorPresupuestoIdAsync(presupuestoId) ?? new List<Proyeccion>();
 
     decimal totalIngresos = proyecciones.Where(p => p.Tipo).Sum(p => p.Monto);
     decimal totalGastos = proyecciones.Where(p => !p.Tipo).Sum(p => p.Monto);
-    
-    if (totalIngresos == 0)
-    {
-        return Ok(new { mensaje = "No hay ingresos registrados para este presupuesto, no se puede calcular el porcentaje de ahorro." });
-    }
 
     decimal balance = totalIngresos - totalGastos;
-    decimal porcentajeGasto = Math.Round((totalGastos / totalIngresos) * 100, 2);
-    decimal porcentajeAhorro = Math.Round((balance / totalIngresos) * 100, 2);
+    decimal porcentajeGasto = totalIngresos == 0 ? 0 : Math.Round((totalGastos / totalIngresos) * 100, 2);
+    decimal porcentajeAhorro = totalIngresos == 0 ? 0 : Math.Round((balance / totalIngresos) * 100, 2);
     bool tieneAhorro = balance >= 0;
     if(porcentajeGasto < 0)
         porcentajeGasto = 0;
- 
+
 
     var reporte = new ReporteDto
     {

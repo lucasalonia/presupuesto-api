@@ -16,13 +16,16 @@ public class ProyeccionRepositorio : IProyeccionRepositorio
     public async Task<IEnumerable<Proyeccion>> BuscarPorPresupuestoIdAsync(int presupuestoId)
     {
         return await _context.Proyecciones
+            .Include(p => p.Categoria)
             .Where(p => p.IdPresupuesto == presupuestoId)
             .ToListAsync();
     }
 
     public async Task<Proyeccion?> BuscarPorIdAsync(int id)
     {
-        return await _context.Proyecciones.FindAsync(id);
+        return await _context.Proyecciones
+            .Include(p => p.Categoria)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task AgregarAsync(Proyeccion proyeccion)
