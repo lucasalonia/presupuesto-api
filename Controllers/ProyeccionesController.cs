@@ -26,12 +26,10 @@ public class ProyeccionesController : ControllerBase
     [HttpGet("listar/{presupuestoId}")]
     [Authorize]
     public async Task<IActionResult> ListarProyecciones(int presupuestoId)
-    {
-        
+    {   
         var proyecciones = await _proyeccionRepositorio.BuscarPorPresupuestoIdAsync(presupuestoId);
-        if (proyecciones == null || !proyecciones.Any())
-            return NotFound(new { mensaje = "No se encontraron proyecciones para este presupuesto." });
-        return Ok(proyecciones);
+        
+        return Ok(proyecciones?? new List<Proyeccion>());
     }
 
     [HttpGet("mostrar/{id}")]
@@ -89,6 +87,22 @@ public class ProyeccionesController : ControllerBase
         return CreatedAtAction(nameof(MostrarProyeccion), new { id = proyeccion.Id }, proyeccionDto);
     }
 
+    [HttpDelete("eliminar/{id}")]
+    [Authorize]
+    public async Task<IActionResult> EliminarProyeccion(int id)
+    {
+        var idClaim = User.FindFirst("idUsuario")?.Value;
+        if (idClaim == null)
+            return Unauthorized();
+
+        var proyeccion = await _proyeccionRepositorio.BuscarPorIdAsync(id);
+        if (proyeccion == null)
+            return NotFound("\"Proyección no encontrada.\"");
+
+        await _proyeccionRepositorio.EliminarAsync(proyeccion);
+        return Ok("\"Proyección eliminada correctamente.\"");
+    }
+
     [HttpPatch("actualizar/{id}")]
     [Authorize]
     public async Task<IActionResult> ActualizarProyeccion(int id, [FromBody] ProyeccionDto proyeccionDto)
@@ -133,4 +147,22 @@ public class ProyeccionesController : ControllerBase
         await _proyeccionRepositorio.ActualizarAsync(proyeccion);
         return Ok(proyeccion);
     }
+private IEnumerable<ProyeccionDto> MapearAProyecciones(IEnumerable<Presupuesto> presupuestos)
+    {
+        return presupuestos.SelectMany(p => p.Proyecciones.Select(pr => new ProyeccionDto
+        {
+            Id = pr.Id,
+            IdPresupuesto = pr.IdPresupuesto,
+            IdCategoria = pr.IdCategoria,
+            Tipo = pr.Tipo,
+            Nombre = pr.Nombre,
+            Descripcion = pr.Descripcion,
+            Monto = pr.Monto,
+            FechaInicio = pr.FechaCreacion,
+            FechaFin = pr.FechaModificacion
+        })).ToList() ?? new List<ProyeccionDto>();
+         
+    }
+
+
 }
